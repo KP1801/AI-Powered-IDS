@@ -1,99 +1,93 @@
-# 🛡️ Explainable Stacked-Ensemble Intrusion Detection System
+# 🛡️ AI-Powered Explainable Intrusion Detection System
 
-An AI-powered Network Intrusion Detection System (NIDS) that goes beyond the typical
-"train one classifier, report accuracy" project. It combines three things that are
-rarely put together in one repo:
+![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square&logo=python)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-ML-orange?style=flat-square&logo=scikitlearn)
+![XGBoost](https://img.shields.io/badge/XGBoost-Ensemble-red?style=flat-square)
+![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-ff4b4b?style=flat-square&logo=streamlit)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
-1. **A stacking ensemble** (Random Forest + XGBoost + Neural Net → Logistic Regression meta-learner)
-   instead of a single model, to reduce blind spots any one algorithm has.
-2. **Explainable AI** — every alert tells you *which features* drove the
-   decision and by how much, not just "attack detected." Implemented from
-   scratch in pure Python/NumPy (no `shap`/`numba`), so it runs on
-   locked-down machines where native compiled extensions get blocked by
-   Application Control policies.
-3. **A live-simulation dashboard** (Streamlit) that replays real held-out network
-   traffic as if it were arriving in real time, with running stats, per-category
-   breakdowns, and a live explanation panel for the most recent alert.
-
-Trained and evaluated on **NSL-KDD**, the standard benchmark dataset for
-intrusion-detection research (an improved, de-duplicated version of the classic
-KDD Cup 1999 dataset).
+A network intrusion detection system that combines a 3-model stacking ensemble (Random Forest + XGBoost + Neural Net), a from-scratch explainability layer, and a live-simulation dashboard — trained and evaluated on NSL-KDD, the standard academic benchmark for intrusion detection research.
 
 ---
 
-## Why this is different from most IDS repos on GitHub
+## 📸 Screenshots
 
-| Typical IDS project | This project |
-|---|---|
-| One model (RF or a single NN) | 3-model stacking ensemble with a learned meta-combiner |
-| "Attack / Normal" label only | Attack **category** (DoS / Probe / R2L / U2R) + confidence |
-| A confusion matrix in a notebook | A live dashboard simulating real traffic |
-| Black-box predictions | Per-alert feature-contribution explanation (which features, which direction) |
-| Notebook-only, hard to reuse | Clean `src/` package: preprocess → train → explain → predict, reusable end to end |
+### Dashboard Overview
+![Dashboard Overview](screenshots/dashboard_overview.png)
+
+### Live Alert Feed + Category Breakdown
+> Running stats, color-coded attack feed, and a live category chart
+
+![Alert Feed](screenshots/alert_feed.png)
+
+### Feature-Contribution Explanation
+> Every alert shows which features pushed the model toward "attack" (red) or "normal" (blue)
+
+![Explanation Chart](screenshots/explanation_chart.png)
+
+*(Run `streamlit run dashboard/app.py`, click ▶ Play, and save your own screenshots into `screenshots/` to replace these placeholders.)*
 
 ---
 
-## Architecture
+## ⚙️ How It Works
 
 ```
-Raw NSL-KDD traffic (41 features per connection)
-            │
-            ▼
-   ┌─────────────────┐
-   │  Preprocessing   │  categorical encoding + standard scaling
-   └────────┬─────────┘
-            ▼
-   ┌────────────────────────────────────────────┐
-   │            Stacking Ensemble                │
-   │  ┌───────────┐ ┌──────────┐ ┌────────────┐  │
-   │  │  Random   │ │ XGBoost  │ │  Neural    │  │
-   │  │  Forest   │ │          │ │  Net (MLP) │  │
-   │  └─────┬─────┘ └────┬─────┘ └─────┬──────┘  │
-   │        └───────────┬─────────────┘          │
-   │              Logistic Regression             │
-   │              (meta-learner)                  │
-   └────────────────────┬─────────────────────────┘
-                         ▼
-        Binary verdict (normal / attack)
-        + Attack category (DoS / Probe / R2L / U2R)
-                         │
-                         ▼
-              Feature-contribution explanation
-              (pure Python/NumPy decision-path
-              walk over the Random Forest
-              base-learner — no compiled/native
-              dependencies required)
-                         │
-                         ▼
-            Streamlit live dashboard
+Raw NSL-KDD Traffic (41 fields per connection)
+             │
+             ▼
+┌───────────────────────────────┐
+│        Preprocessing          │
+│  Encode categoricals + scale  │
+└───────────────┬────────────────┘
+                ▼
+┌────────────────────────────────────────┐
+│           Stacking Ensemble             │
+│  Random Forest · XGBoost · Neural Net   │
+│         └── Logistic Regression ──┘     │
+│               (meta-learner)            │
+└─────────┬───────────────────┬───────────┘
+          │                   │
+          ▼                   ▼
+┌──────────────────┐  ┌──────────────────────┐
+│  Verdict + Class  │  │  Feature Explanation │
+│ attack/normal +   │  │  pure NumPy decision- │
+│ DoS/Probe/R2L/U2R │  │  path attribution     │
+└─────────┬──────────┘  └──────────┬───────────┘
+          │                        │
+          └───────────┬────────────┘
+                       ▼
+        ┌───────────────────────────────┐
+        │     Streamlit Live Dashboard   │
+        │      http://localhost:8501     │
+        └───────────────────────────────┘
 ```
-
-Two models are trained: a **binary** model (fast first-pass filter: is this
-malicious at all?) and a **multi-class** model (what kind of attack is it?).
-This mirrors how layered detection is often designed in practice.
 
 ---
 
-## Results (NSL-KDD official test set — `KDDTest+`, contains attack types not
-seen during training, which is the standard, harder evaluation protocol)
+## 🚀 Features
 
-**Binary classification (normal vs. attack)**
+- **3-Model Stacking Ensemble** — Random Forest + XGBoost + Neural Net (MLP), combined by a Logistic Regression meta-learner instead of relying on a single algorithm
+- **Two-Stage Classification** — a fast binary filter (attack vs. normal) followed by a multi-class model that identifies the attack category
+- **4 Attack Categories** — DoS, Probe, R2L (Remote-to-Local), and U2R (User-to-Root), grouped from 22+ raw NSL-KDD attack labels
+- **From-Scratch Explainability** — every alert reports which features drove the decision and by how much, implemented in pure Python/NumPy with no `shap`/`numba` dependency, so it runs on locked-down machines where native compiled extensions get blocked by Application Control policies
+- **Live-Simulation Dashboard** — Streamlit app that replays real held-out NSL-KDD test traffic with running stats, a color-coded alert feed, a category breakdown chart, and a live explanation panel
+- **Adversarial Robustness Testing** — a black-box perturbation search that measures how easily an attacker could evade detection by tweaking attacker-controllable features
+- **Offline-Friendly** — falls back to a synthetic, schema-matched dataset if the real NSL-KDD mirror is unreachable
 
-| Metric | Score |
-|---|---|
-| Accuracy | 80.6% |
-| Precision (weighted) | 85.2% |
-| Recall (weighted) | 80.6% |
-| F1-score (weighted) | 80.5% |
+---
 
-**Multi-class classification (attack category)**
+## 📊 Live Results
 
-| Metric | Score |
-|---|---|
-| Accuracy | 74.4% |
-| Precision (weighted) | 86.4% |
-| Recall (weighted) | 74.4% |
-| F1-score (weighted) | 75.1% |
+From an actual run of this project, evaluated on the official NSL-KDD test set (`KDDTest+`), which deliberately includes attack variants not seen during training:
+
+| Metric | Binary (attack vs. normal) | Multi-class (attack category) |
+|---|---|---|
+| Accuracy | 80.6% | 74.4% |
+| Precision (weighted) | 85.2% | 86.4% |
+| Recall (weighted) | 80.6% | 74.4% |
+| F1-score (weighted) | 80.5% | 75.1% |
+
+**Per-category breakdown:**
 
 | Category | Precision | Recall | F1 | Support |
 |---|---|---|---|---|
@@ -103,121 +97,179 @@ seen during training, which is the standard, harder evaluation protocol)
 | R2L | 0.92 | 0.06 | 0.12 | 2,887 |
 | U2R | 0.02 | 0.67 | 0.03 | 67 |
 
-**Why R2L/U2R recall is low, and why that's expected and worth discussing:**
-NSL-KDD's official test set deliberately includes attack *variants* the model
-never saw in training, specifically to test generalization rather than
-memorization — this is well documented in IDS literature, and R2L/U2R are the
-rarest, stealthiest classes (a few dozen to a few thousand examples out of
-125k). Reporting this honestly, rather than hiding it, is intentional: a real
-strength of the explainability layer is that it lets an analyst inspect
-*why* a borderline U2R/R2L connection was or wasn't flagged, which is exactly
-where a black-box model would otherwise fail silently. See **Future Work**
-for concrete ways to improve this (oversampling, anomaly-based second stage).
+**Adversarial robustness check** (300 known attacks, bounded feature perturbation):
+
+| Metric | Value |
+|---|---|
+| Caught by model (baseline) | 222 / 300 (74.0% recall) |
+| Evaded via bounded perturbation | 117 / 222 (52.7%) |
+| Recall after adversarial attempt | 35.0% |
+
+*R2L/U2R recall is low because these are the rarest, stealthiest attack types (a few dozen to a few thousand samples out of 125,973) and the official test set includes variants never seen in training — see **Future Work** for how this project would address it.*
 
 ---
 
-## Project structure
+## 📂 Project Structure
 
 ```
 ai-powered-ids/
 ├── data/
-│   └── download_data.py      # downloads NSL-KDD (with offline synthetic fallback)
+│   └── download_data.py        # downloads NSL-KDD (offline synthetic fallback)
 ├── src/
-│   ├── utils.py               # dataset schema, attack-category mapping
-│   ├── preprocess.py          # encoding + scaling pipeline
-│   ├── ensemble_model.py      # stacking classifier definition
-│   ├── train.py                # trains + evaluates both models, saves artifacts
-│   ├── predict.py              # clean inference interface
-│   └── explain.py              # pure Python/NumPy explanation layer (no shap/numba)
+│   ├── utils.py                 # dataset schema, attack-category mapping
+│   ├── preprocess.py            # encoding + scaling pipeline
+│   ├── ensemble_model.py        # stacking classifier definition
+│   ├── train.py                 # trains + evaluates both models
+│   ├── predict.py                # clean inference interface
+│   ├── explain.py                # pure Python/NumPy explanation layer
+│   └── adversarial_test.py       # robustness evaluation
 ├── dashboard/
-│   └── app.py                  # Streamlit live-simulation dashboard
-├── models/                     # trained models + metrics (generated)
+│   └── app.py                    # Streamlit live-simulation dashboard
+├── tests/
+│   └── test_pipeline.py          # pytest suite
+├── screenshots/                  # dashboard screenshots (add your own)
+├── models/                       # trained models + metrics (gitignored, generated)
+├── .github/workflows/ci.yml      # GitHub Actions test workflow
 ├── requirements.txt
+├── TROUBLESHOOTING.md
 └── README.md
 ```
 
 ---
 
-## Setup
+## ⚡ Quick Start
 
-> **Note:** `models/` starts empty on purpose. You train the models
-> locally in step 2 below using whatever library versions `pip` resolves
-> for your machine — this avoids scikit-learn's well-known cross-version
-> pickle incompatibility (loading a `.pkl` model trained with a different
-> scikit-learn version than the one installed can throw an `AttributeError`
-> on an internal sklearn attribute). See `TROUBLESHOOTING.md` if you ever
-> hit that.
-
+### 1. Clone the Repository
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/YOUR_USERNAME/ai-powered-ids.git
 cd ai-powered-ids
-pip install -r requirements.txt
-
-# 1. Download the dataset (falls back to a synthetic dataset if offline)
-python data/download_data.py
-
-# 2. Train both models (~6-8 minutes on a typical laptop CPU)
-python src/train.py
-
-# 3. Launch the live dashboard
-streamlit run dashboard/app.py
 ```
 
-Then open the URL Streamlit prints (usually `http://localhost:8501`), set a
-playback speed in the sidebar, and click **▶ Play** (or **⏭ Step one row**
-to advance manually).
+### 2. Install Dependencies
+```bash
+python -m venv venv
+source venv/bin/activate      # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-> **Getting an error right after launch, especially anything mentioning
-> `AttributeError` on a scikit-learn class?** See [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
-> — it's almost always a library-version mismatch with the pre-shipped
-> `.pkl` models, fixed in under a minute by deleting `models/*.pkl` and
-> running `python src/train.py` to regenerate them with your own installed
-> versions.
+### 3. Download the Dataset
+```bash
+python data/download_data.py
+```
 
-### Quick CLI test (no dashboard)
+### 4. Train the Models
+```bash
+python src/train.py
+# ~6-8 minutes on a typical laptop CPU
+```
 
-```python
+### 5. Launch the Dashboard
+```bash
+streamlit run dashboard/app.py
+# Open http://localhost:8501
+```
+
+---
+
+## 🧪 Testing It Out
+
+```bash
+# Run the automated test suite
+pip install pytest
+pytest tests/ -v
+
+# Check adversarial robustness
+python src/adversarial_test.py
+
+# Quick CLI prediction test (no dashboard needed)
+python -c "
 from src.predict import IDSPredictor
 from src.explain import IDSExplainer
 import numpy as np
 
-X = np.load("models/demo_traffic_sample_scaled.npy")
+X = np.load('models/demo_traffic_sample_scaled.npy')
 predictor, explainer = IDSPredictor(), IDSExplainer()
-
 print(predictor.predict(X[:5]))
 print(explainer.explain_instance(X[0]))
+"
 ```
 
----
-
-## Dataset
-
-[NSL-KDD](https://www.unb.ca/cic/datasets/nsl.html) — a refined version of
-KDD Cup 1999 that removes redundant records and rebalances difficulty, making
-it a fairer benchmark than the original. Each of the 125,973 training and
-22,544 test connections is described by 41 features (traffic volume,
-connection flags, login behavior, host-based statistics, etc.) and is
-labeled either `normal` or with one of 22+ specific attack types, which this
-project groups into 4 top-level categories: **DoS, Probe, R2L, U2R**.
+In the dashboard, use **▶ Play** for continuous playback or **⏭ Step one row** to walk through the simulation and inspect each alert's explanation one at a time.
 
 ---
 
-## Future work
+## 🤖 ML Models Used
 
-- **Class imbalance for R2L/U2R**: SMOTE / class-weighted focal loss, or a
-  dedicated anomaly-detection second stage (e.g. Isolation Forest) for rare
-  classes instead of relying on the multi-class softmax alone.
-- **Real packet capture input**: swap the CSV replay in the dashboard for a
-  live `scapy`/`pyshark` feature extractor with the same 41-feature schema.
-- **Adversarial robustness testing**: evaluate how easily an attacker could
-  perturb traffic features to evade detection (feature-space adversarial
-  examples), and harden the ensemble against it.
-- **Model drift monitoring**: track live-accuracy-vs-ground-truth over time
-  in production and trigger retraining alerts.
+| Model | Purpose |
+|---|---|
+| Random Forest | Base learner — strong on non-linear tabular splits; also powers the explanation layer |
+| XGBoost | Base learner — strong on structured, imbalanced data |
+| MLP (Neural Net) | Base learner — catches patterns the tree models miss |
+| Logistic Regression | Meta-learner — combines the three base learners' out-of-fold predictions |
+
+**Attack categories classified:**
+- `DoS` — Denial of Service (neptune, smurf, back, teardrop, ...)
+- `Probe` — surveillance / port scanning (satan, nmap, portsweep, ...)
+- `R2L` — Remote-to-Local unauthorized access (guess_passwd, ftp_write, ...)
+- `U2R` — User-to-Root privilege escalation (buffer_overflow, rootkit, ...)
 
 ---
 
-## License
+## 🎛️ Configuration
 
-This project is released under the MIT License. The NSL-KDD dataset is a
-public research benchmark, freely available for academic and research use.
+The dashboard's sidebar exposes runtime controls — no environment variables or config files needed:
+
+| Control | What it does |
+|---|---|
+| Rows per second | Playback speed during ▶ Play |
+| Total rows to simulate | How many held-out test connections to replay |
+| ▶ Play / ⏸ Pause | Continuous autoplay |
+| ⏭ Step one row | Advance exactly one connection at a time |
+| ⟲ Reset | Clear the alert log and stats |
+
+---
+
+## 🧰 Tech Stack
+
+| Category | Tools |
+|---|---|
+| Language | Python 3.10+ |
+| Machine Learning | scikit-learn, XGBoost, NumPy, pandas |
+| Explainability | Pure Python/NumPy (custom decision-path attribution — no shap/numba) |
+| Dashboard | Streamlit, Plotly |
+| Testing | pytest, GitHub Actions CI |
+| Dataset | NSL-KDD (KDD Cup 99 successor) |
+
+---
+
+## ⚠️ Notes & Limitations
+
+- **This is a simulation, not a live sensor.** The dashboard replays real, historical NSL-KDD test traffic from a saved CSV/array — it is not watching live packets on your network. See the README's "Future Work" for what a live `scapy`/`pyshark` version would need.
+- **`models/` starts empty on purpose.** Always train locally with `python src/train.py` rather than copying `.pkl` files between machines — scikit-learn does not guarantee pickled models load correctly across different library versions. See `TROUBLESHOOTING.md`.
+- This project is for **educational and portfolio purposes**. It is not a production security product.
+
+---
+
+## 🔭 Future Work
+
+- **Class imbalance for R2L/U2R** — SMOTE, class-weighted focal loss, or a dedicated anomaly-detection second stage (e.g. Isolation Forest)
+- **Real packet capture input** — swap the CSV replay for a live `scapy`/`pyshark` feature extractor with the same 41-feature schema
+- **Model drift monitoring** — track live-accuracy-vs-ground-truth over time and trigger retraining alerts
+
+---
+
+## 📄 License
+
+MIT License — free to use, modify, and distribute. The NSL-KDD dataset is a public research benchmark, freely available for academic and research use.
+
+---
+
+## 👤 Author
+
+**Your Name**
+- GitHub: [@your-username](https://github.com/your-username)
+- Email: your.email@example.com
+
+---
+
+⭐ If this project helped you, consider giving it a star on GitHub!
