@@ -268,7 +268,7 @@ MIT License — free to use, modify, and distribute. The NSL-KDD dataset is a pu
 ##  Author
 
 **Your Name**
-- GitHub: [@your-username](https://github.com/KP1801)
+- GitHub: [@KP1801](https://github.com/KP1801)
 - Email: kirtipainkra.18@gmail.com
 
 ---
