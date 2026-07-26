@@ -10,7 +10,7 @@ A network intrusion detection system that combines a 3-model stacking ensemble (
 
 ---
 
-## 📸 Screenshots
+##  Screenshots
 
 ### Dashboard Overview
 ![Dashboard Overview](https://github.com/KP1801/AI-Powered-IDS/blob/main/Screenshots/Dashboard.png)
@@ -30,7 +30,7 @@ A network intrusion detection system that combines a 3-model stacking ensemble (
 
 ---
 
-## ⚙️ How It Works
+## How It Works
 
 ```
 Raw NSL-KDD Traffic (41 fields per connection)
@@ -65,7 +65,7 @@ Raw NSL-KDD Traffic (41 fields per connection)
 
 ---
 
-## 🚀 Features
+## Features
 
 - **3-Model Stacking Ensemble** — Random Forest + XGBoost + Neural Net (MLP), combined by a Logistic Regression meta-learner instead of relying on a single algorithm
 - **Two-Stage Classification** — a fast binary filter (attack vs. normal) followed by a multi-class model that identifies the attack category
@@ -77,7 +77,7 @@ Raw NSL-KDD Traffic (41 fields per connection)
 
 ---
 
-## 📊 Live Results
+## Live Results
 
 From an actual run of this project, evaluated on the official NSL-KDD test set (`KDDTest+`), which deliberately includes attack variants not seen during training:
 
@@ -110,7 +110,7 @@ From an actual run of this project, evaluated on the official NSL-KDD test set (
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
 ```
 ai-powered-ids/
@@ -138,7 +138,7 @@ ai-powered-ids/
 
 ---
 
-## ⚡ Quick Start
+##  Quick Start
 
 ### 1. Clone the Repository
 ```bash
@@ -172,7 +172,7 @@ streamlit run dashboard/app.py
 
 ---
 
-## 🧪 Testing It Out
+##  Testing It Out
 
 ```bash
 # Run the automated test suite
@@ -199,7 +199,7 @@ In the dashboard, use **▶ Play** for continuous playback or **⏭ Step one row
 
 ---
 
-## 🤖 ML Models Used
+##  ML Models Used
 
 | Model | Purpose |
 |---|---|
@@ -216,7 +216,7 @@ In the dashboard, use **▶ Play** for continuous playback or **⏭ Step one row
 
 ---
 
-## 🎛️ Configuration
+##  Configuration
 
 The dashboard's sidebar exposes runtime controls — no environment variables or config files needed:
 
@@ -230,7 +230,7 @@ The dashboard's sidebar exposes runtime controls — no environment variables or
 
 ---
 
-## 🧰 Tech Stack
+##  Tech Stack
 
 | Category | Tools |
 |---|---|
@@ -243,7 +243,7 @@ The dashboard's sidebar exposes runtime controls — no environment variables or
 
 ---
 
-## ⚠️ Notes & Limitations
+##  Notes & Limitations
 
 - **This is a simulation, not a live sensor.** The dashboard replays real, historical NSL-KDD test traffic from a saved CSV/array — it is not watching live packets on your network. See the README's "Future Work" for what a live `scapy`/`pyshark` version would need.
 - **`models/` starts empty on purpose.** Always train locally with `python src/train.py` rather than copying `.pkl` files between machines — scikit-learn does not guarantee pickled models load correctly across different library versions. See `TROUBLESHOOTING.md`.
@@ -251,7 +251,7 @@ The dashboard's sidebar exposes runtime controls — no environment variables or
 
 ---
 
-## 🔭 Future Work
+##  Future Work
 
 - **Class imbalance for R2L/U2R** — SMOTE, class-weighted focal loss, or a dedicated anomaly-detection second stage (e.g. Isolation Forest)
 - **Real packet capture input** — swap the CSV replay for a live `scapy`/`pyshark` feature extractor with the same 41-feature schema
@@ -259,17 +259,17 @@ The dashboard's sidebar exposes runtime controls — no environment variables or
 
 ---
 
-## 📄 License
+##  License
 
 MIT License — free to use, modify, and distribute. The NSL-KDD dataset is a public research benchmark, freely available for academic and research use.
 
 ---
 
-## 👤 Author
+##  Author
 
 **Your Name**
-- GitHub: [@your-username](https://github.com/your-username)
-- Email: your.email@example.com
+- GitHub: [@your-username](https://github.com/KP1801)
+- Email: kirtipainkra.18@gmail.com
 
 ---
 
