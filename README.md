@@ -13,7 +13,7 @@ A network intrusion detection system that combines a 3-model stacking ensemble (
 ## 📸 Screenshots
 
 ### Dashboard Overview
-![Dashboard Overview](screenshots/dashboard_overview.png)
+![Dashboard Overview](https://github.com/KP1801/AI-Powered-IDS/blob/main/Screenshots/Dashboard.png)
 
 ### Live Alert Feed + Category Breakdown
 > Running stats, color-coded attack feed, and a live category chart
