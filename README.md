@@ -19,12 +19,12 @@ A network intrusion detection system that combines a 3-model stacking ensemble (
 ### Live Alert Feed + Category Breakdown
 > Running stats, color-coded attack feed, and a live category chart
 
-![Alert Feed](screenshots/Alertfeed.png)
+![Alert Feed](https://github.com/KP1801/AI-Powered-IDS/blob/main/Screenshots/Alertfeed.png)
 
 ### Feature-Contribution Explanation
 > Every alert shows which features pushed the model toward "attack" (red) or "normal" (blue)
 
-![Explanation Chart](screenshots/Explanation_chart.png)
+![Explanation Chart](https://github.com/KP1801/AI-Powered-IDS/blob/main/Screenshots/Explanation%20chart.png)
 
 *(Run `streamlit run dashboard/app.py`, click ▶ Play, and save your own screenshots into `screenshots/` to replace these placeholders.)*
 
